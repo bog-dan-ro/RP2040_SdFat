@@ -46,20 +46,6 @@
 // Options can be set in a makefile or an IDE like platformIO
 // if they are in a #ifndef/#endif block below.
 //------------------------------------------------------------------------------
-/** For Debug - must be one */
-#define ENABLE_ARDUINO_FEATURES 1
-/** For Debug - must be one */
-#define ENABLE_ARDUINO_SERIAL 1
-/** For Debug - must be one */
-#define ENABLE_ARDUINO_STRING 1
-//------------------------------------------------------------------------------
-#if ENABLE_ARDUINO_FEATURES
-#include "Arduino.h"
-#ifdef PLATFORM_ID
-// Only defined if a Particle device.
-#include "application.h"
-#endif  // PLATFORM_ID
-#endif  // ENABLE_ARDUINO_FEATURES
 //------------------------------------------------------------------------------
 /**
  * File types for SdFat, File, SdFile, SdBaseFile, fstream,
@@ -119,7 +105,7 @@
  * 3 - An external SPI driver derived from SdSpiBaseClass is always used.
  */
 #ifndef SPI_DRIVER_SELECT
-#define SPI_DRIVER_SELECT 0
+#define SPI_DRIVER_SELECT 3
 #endif  // SPI_DRIVER_SELECT
 /**
  * If USE_SPI_ARRAY_TRANSFER is one and the standard SPI library is

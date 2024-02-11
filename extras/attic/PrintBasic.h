@@ -32,7 +32,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "../SdFatConfig.h"
+#include "SdFatConfig.h"
 
 #ifndef F
 #if defined(__AVR__)
@@ -61,24 +61,6 @@ class PrintBasic {
   int getWriteError() { return m_error; }
   size_t print(char c) { return write(c); }
   size_t print(const char *str) { return write(str); }
-  size_t print(const __FlashStringHelper *str) {
-#ifdef __AVR__
-    PGM_P p = reinterpret_cast<PGM_P>(str);
-    size_t n = 0;
-    for (uint8_t c; (c = pgm_read_byte(p + n)) && write(c); n++) {
-    }
-    return n;
-#else   // __AVR__
-    return print(reinterpret_cast<const char *>(str));
-#endif  // __AVR__
-  }
-  size_t println(const __FlashStringHelper *str) {
-#ifdef __AVR__
-    return print(str) + println();
-#else   // __AVR__
-    return println(reinterpret_cast<const char *>(str));
-#endif  // __AVR__
-  }
   size_t print(double n, uint8_t prec = 2) { return printDouble(n, prec); }
   size_t print(signed char n, uint8_t base = 10) {
     return print((long)n, base);

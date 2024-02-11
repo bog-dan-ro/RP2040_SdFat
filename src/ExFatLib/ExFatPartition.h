@@ -28,10 +28,10 @@
  * \file
  * \brief ExFatPartition include file.
  */
-#include "../common/FsBlockDevice.h"
 #include "../common/FsCache.h"
 #include "../common/FsStructs.h"
 #include "../common/SysCall.h"
+#include "common/FsBlockDevice.h"
 /** Set EXFAT_READ_ONLY non-zero for read only */
 #ifndef EXFAT_READ_ONLY
 #define EXFAT_READ_ONLY 0

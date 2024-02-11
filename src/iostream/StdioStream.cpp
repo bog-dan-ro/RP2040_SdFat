@@ -259,24 +259,6 @@ int StdioStream::write(const void* buf, size_t count) {
   return count;
 }
 //------------------------------------------------------------------------------
-#if (defined(ARDUINO) && ENABLE_ARDUINO_FEATURES) || defined(DOXYGEN)
-size_t StdioStream::print(const __FlashStringHelper* str) {
-#ifdef __AVR__
-  PGM_P p = reinterpret_cast<PGM_P>(str);
-  uint8_t c;
-  while ((c = pgm_read_byte(p))) {
-    if (putc(c) < 0) {
-      return 0;
-    }
-    p++;
-  }
-  return p - reinterpret_cast<PGM_P>(str);
-#else   // __AVR__
-  return print(reinterpret_cast<const char*>(str));
-#endif  // __AVR__
-}
-#endif  // (defined(ARDUINO) && ENABLE_ARDUINO_FEATURES) || defined(DOXYGEN)
-//------------------------------------------------------------------------------
 int StdioStream::printDec(float value, uint8_t prec) {
   char buf[24];
   char* ptr = fmtDouble(buf + sizeof(buf), value, prec, false);

@@ -70,36 +70,6 @@ class BufferedPrint {
     *--str = c;
     return write(str, buf + sizeof(buf) - str);
   }
-  /** Print a string stored in AVR flash followed by a field terminator.
-   * \param[in] fsh string to print.
-   * \param[in] term The field terminator.  Use '\\n' for CR LF.
-   * \return true for success or false if an error occurs.
-   */
-  size_t printField(const __FlashStringHelper* fsh, char term) {
-#ifdef __AVR__
-    size_t rtn = 0;
-    PGM_P p = reinterpret_cast<PGM_P>(fsh);
-    char c;
-    while ((c = pgm_read_byte(p++))) {
-      if (!write(&c, 1)) {
-        return 0;
-      }
-      rtn++;
-    }
-    if (term) {
-      char buf[2];
-      char* str = buf + sizeof(buf);
-      *--str = term;
-      if (term == '\n') {
-        *--str = '\r';
-      }
-      rtn += write(str, buf + sizeof(buf) - str);
-    }
-    return rtn;
-#else   // __AVR__
-    return printField(reinterpret_cast<const char*>(fsh), term);
-#endif  // __AVR__
-  }
   /** Print a string followed by a field terminator.
    * \param[in] str string to print.
    * \param[in] term The field terminator.  Use '\\n' for CR LF.

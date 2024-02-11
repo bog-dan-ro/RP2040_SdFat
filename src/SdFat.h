@@ -33,6 +33,7 @@
 #include "FsLib/FsLib.h"
 #include "SdCard/SdCard.h"
 #include "common/SysCall.h"
+#include "stdio.h"
 #if INCLUDE_SDIOS
 #include "sdios.h"
 #endif  // INCLUDE_SDIOS
@@ -55,14 +56,15 @@ class SdBase : public Vol {
    * \param[in] csPin SD card chip select pin.
    * \return true for success or false for failure.
    */
-  bool begin(SdCsPin_t csPin = SS) {
+     bool begin(SdCsPin_t csPin)
+     {
 #ifdef BUILTIN_SDCARD
     if (csPin == BUILTIN_SDCARD) {
       return begin(SdioConfig(FIFO_SDIO));
     }
 #endif  // BUILTIN_SDCARD
     return begin(SdSpiConfig(csPin, SHARED_SPI));
-  }
+     }
   //----------------------------------------------------------------------------
   /** Initialize SD card and file system.
    *
@@ -151,17 +153,6 @@ class SdBase : public Vol {
     errorHalt(pr);
   }
   //----------------------------------------------------------------------------
-  /** %Print msg and halt.
-   *
-   * \param[in] pr Print destination.
-   * \param[in] msg Message to print.
-   */
-  void errorHalt(print_t* pr, const __FlashStringHelper* msg) {
-    pr->print(F("error: "));
-    pr->println(msg);
-    errorHalt(pr);
-  }
-  //----------------------------------------------------------------------------
   /** Format SD card
    *
    * \param[in] pr Print destination.
@@ -216,16 +207,6 @@ class SdBase : public Vol {
    * \param[in] msg Message to print.
    */
   void initErrorHalt(print_t* pr, const char* msg) {
-    pr->println(msg);
-    initErrorHalt(pr);
-  }
-  //----------------------------------------------------------------------------
-  /** %Print error info and halt.
-   *
-   * \param[in] pr Print destination.
-   * \param[in] msg Message to print.
-   */
-  void initErrorHalt(print_t* pr, const __FlashStringHelper* msg) {
     pr->println(msg);
     initErrorHalt(pr);
   }
@@ -287,16 +268,6 @@ class SdBase : public Vol {
     errorPrint(pr);
   }
 
-  /** %Print msg, any SD error code.
-   *
-   * \param[in] pr Print destination.
-   * \param[in] msg Message to print.
-   */
-  void errorPrint(print_t* pr, const __FlashStringHelper* msg) {
-    pr->print(F("error: "));
-    pr->println(msg);
-    errorPrint(pr);
-  }
   //----------------------------------------------------------------------------
   /** %Print error info and return.
    *
@@ -348,53 +319,6 @@ class SdBase : public Vol {
    * \return true for success or false for failure.
    */
   bool volumeBegin() { return Vol::begin(m_card); }
-#if ENABLE_ARDUINO_SERIAL
-  /** Print error details after begin() fails. */
-  void initErrorPrint() { initErrorPrint(&Serial); }
-  //----------------------------------------------------------------------------
-  /** %Print msg to Serial and halt.
-   *
-   * \param[in] msg Message to print.
-   */
-  void errorHalt(const __FlashStringHelper* msg) { errorHalt(&Serial, msg); }
-  //----------------------------------------------------------------------------
-  /** %Print error info to Serial and halt. */
-  void errorHalt() { errorHalt(&Serial); }
-  //----------------------------------------------------------------------------
-  /** %Print error info and halt.
-   *
-   * \param[in] msg Message to print.
-   */
-  void errorHalt(const char* msg) { errorHalt(&Serial, msg); }
-  //----------------------------------------------------------------------------
-  /** %Print error info and halt. */
-  void initErrorHalt() { initErrorHalt(&Serial); }
-  //----------------------------------------------------------------------------
-  /** %Print msg, any SD error code.
-   *
-   * \param[in] msg Message to print.
-   */
-  void errorPrint(const char* msg) { errorPrint(&Serial, msg); }
-  /** %Print msg, any SD error code.
-   *
-   * \param[in] msg Message to print.
-   */
-  void errorPrint(const __FlashStringHelper* msg) { errorPrint(&Serial, msg); }
-  //----------------------------------------------------------------------------
-  /** %Print error info and halt.
-   *
-   * \param[in] msg Message to print.
-   */
-  void initErrorHalt(const char* msg) { initErrorHalt(&Serial, msg); }
-  //----------------------------------------------------------------------------
-  /** %Print error info and halt.
-   *
-   * \param[in] msg Message to print.
-   */
-  void initErrorHalt(const __FlashStringHelper* msg) {
-    initErrorHalt(&Serial, msg);
-  }
-#endif  // ENABLE_ARDUINO_SERIAL
   //----------------------------------------------------------------------------
  private:
   SdCard* m_card = nullptr;
@@ -462,15 +386,16 @@ typedef FsFile File;
  * \class SdFile
  * \brief FAT16/FAT32 file with Print.
  */
-class SdFile : public PrintFile<SdBaseFile> {
- public:
-  SdFile() {}
-  /** Create an open SdFile.
+class SdFile : public SdBaseFile
+{
+public:
+    SdFile() {}
+    /** Create an open SdFile.
    * \param[in] path path for file.
    * \param[in] oflag open flags.
    */
-  SdFile(const char* path, oflag_t oflag) { open(path, oflag); }
-  /** Set the date/time callback function
+    SdFile(const char *path, oflag_t oflag) { open(path, oflag); }
+    /** Set the date/time callback function
    *
    * \param[in] dateTime The user's call back function.  The callback
    * function is of the form:
@@ -496,11 +421,8 @@ class SdFile : public PrintFile<SdBaseFile> {
    * sync() maintains the last access date and last modify date/time.
    *
    */
-  static void dateTimeCallback(void (*dateTime)(uint16_t* date,
-                                                uint16_t* time)) {
-    FsDateTime::setCallback(dateTime);
-  }
-  /**  Cancel the date/time callback function. */
-  static void dateTimeCallbackCancel() { FsDateTime::clearCallback(); }
+    static void dateTimeCallback(void (*dateTime)(uint16_t *date, uint16_t *time)) { FsDateTime::setCallback(dateTime); }
+    /**  Cancel the date/time callback function. */
+    static void dateTimeCallbackCancel() { FsDateTime::clearCallback(); }
 };
 #endif  // SdFat_h
